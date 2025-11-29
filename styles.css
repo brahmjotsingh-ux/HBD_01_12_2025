@@ -1,0 +1,403 @@
+/* --- 1. Variables & Global Setup --- */
+:root {
+    --primary-color: #FF6B6B;
+    --secondary-color: #4ECDC4;
+    --accent-color: #FFE66D;
+    /* Pastel Floral Background Image */
+    --bg-image: url('https://images.unsplash.com/photo-1579546929518-9e396f3cc809?auto=format&fit=crop&w=1920&q=80');
+    --card-bg: #ffffff;
+    --text-dark: #2d3436;
+    --text-light: #636e72;
+    --font-heading: 'Dancing Script', cursive;
+    --font-body: 'Poppins', sans-serif;
+    
+    --shadow-soft: 0 10px 25px rgba(0,0,0,0.1);
+    --shadow-card: 0 20px 40px rgba(0,0,0,0.15);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: var(--font-body);
+    /* Pastel background with fallback gradient */
+    background: var(--bg-image) no-repeat center center fixed; 
+    background-size: cover;
+    color: var(--text-dark);
+    height: 100vh;
+    overflow: hidden; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background 1s ease;
+}
+
+/* Overlay to ensure text readability over floral background if needed */
+body::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(255, 255, 255, 0.4); /* Slight white tint */
+    z-index: 0;
+}
+
+button {
+    font-family: inherit;
+    cursor: pointer;
+    border: none;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+button:active { transform: scale(0.95); }
+
+/* Buttons */
+.btn-primary {
+    background: var(--primary-color);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 30px;
+    font-weight: 600;
+    font-size: 1rem;
+    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+}
+
+.btn-secondary {
+    background: white;
+    border: 2px solid var(--secondary-color);
+    color: var(--secondary-color);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 600;
+}
+
+.hidden { display: none !important; }
+
+/* --- 2. Layout & Stages --- */
+.app-container {
+    width: 100%;
+    max-width: 600px;
+    height: 100%;
+    position: relative;
+    z-index: 20; /* Content above decorations */
+}
+
+.stage {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.stage.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+/* --- 3. Card Animation Scene --- */
+.card-scene {
+    perspective: 1000px;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.card-wrapper {
+    width: 300px;
+    height: 400px;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 1s cubic-bezier(0.25, 0.8, 0.25, 1);
+    cursor: pointer;
+}
+
+.card-wrapper.is-open {
+    transform: rotateY(-180deg);
+    pointer-events: none;
+}
+
+.card-front, .card-inside {
+    position: absolute;
+    width: 100%; height: 100%;
+    backface-visibility: hidden;
+    border-radius: 15px;
+    box-shadow: var(--shadow-card);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.card-front {
+    background: linear-gradient(135deg, var(--primary-color), #ff8e8e);
+    color: white;
+    z-index: 2;
+}
+
+.card-front h1 { font-family: var(--font-heading); font-size: 3.5rem; }
+.tap-hint { margin-top: 20px; font-size: 0.9rem; opacity: 0.8; animation: pulse 2s infinite; }
+
+.card-inside {
+    background: rgba(255, 255, 255, 0.95);
+    transform: rotateY(180deg);
+    z-index: 1;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    pointer-events: auto; 
+}
+
+.card-inside h2 { font-family: var(--font-heading); color: var(--primary-color); font-size: 2.5rem; }
+
+/* --- 4. Experience Scrolling Content --- */
+.content-scrollable {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    padding-bottom: 80px;
+    position: relative;
+    z-index: 10;
+}
+
+.section-block {
+    background: rgba(255, 255, 255, 0.90);
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow-soft);
+    text-align: center;
+    backdrop-filter: blur(10px);
+    transition: transform 0.3s;
+}
+
+.section-block h3 { margin-bottom: 15px; color: var(--text-dark); line-height: 1.4; }
+
+/* Timer Display */
+.timer-display {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 1.2rem;
+    color: var(--primary-color);
+    margin: 10px 0;
+    line-height: 1.6;
+    background: rgba(255, 107, 107, 0.1);
+    padding: 15px;
+    border-radius: 10px;
+}
+
+/* Decorations Layer */
+#decorations-layer {
+    position: fixed; 
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    pointer-events: none; 
+    z-index: 15; 
+    overflow: hidden;
+}
+
+/* Wind Layer */
+#wind-layer {
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    pointer-events: none;
+    z-index: 50; /* Above decorations */
+    overflow: hidden;
+}
+
+.wind-streak {
+    position: absolute;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
+    height: 2px;
+    width: 200px;
+    border-radius: 2px;
+    animation: windBlow 1s linear forwards;
+}
+
+@keyframes windBlow {
+    0% { transform: translateX(-100%) translateY(0); opacity: 0; }
+    20% { opacity: 1; }
+    100% { transform: translateX(100vw) translateY(20px); opacity: 0; }
+}
+
+/* Decoration Elements */
+.decor-grid { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 10px; }
+.decor-btn {
+    background: #f1f2f6;
+    padding: 15px 15px;
+    border-radius: 10px;
+    font-size: 1rem;
+    flex: 1 1 30%; /* 3 columns */
+    border: 2px solid transparent;
+}
+.decor-btn:hover { background: #dfe4ea; }
+.decor-btn.active {
+    border-color: var(--primary-color);
+    background: #ffe0e0;
+    font-weight: bold;
+}
+
+/* Realistic Decorations */
+.balloon {
+    position: absolute; 
+    bottom: -120px; 
+    width: 60px; 
+    height: 75px; 
+    border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
+    animation: floatUp 10s linear infinite; 
+    opacity: 0.9;
+    box-shadow: inset -5px -5px 10px rgba(0,0,0,0.1), inset 10px 10px 15px rgba(255,255,255,0.4), 2px 5px 10px rgba(0,0,0,0.1);
+}
+.balloon::before { 
+    content: ''; position: absolute; bottom: -15px; left: 50%; transform: translateX(-50%); 
+    width: 1px; height: 30px; background: rgba(0,0,0,0.4); 
+}
+.balloon::after {
+    content: ''; position: absolute; bottom: -4px; left: 50%; transform: translateX(-50%);
+    width: 8px; height: 6px; background: inherit; border-radius: 50%;
+}
+
+.bubble {
+    position: absolute; 
+    bottom: -60px; 
+    border-radius: 50%;
+    background: radial-gradient(circle at 75% 30%, #fff 5px, #ff00ff00 8% 40%, #fff 50%, #ff00ff00 100%), 
+                radial-gradient(circle at 50% 50%, rgba(255,255,255,0.1), rgba(255,255,255,0.1) 60%, rgba(255, 255, 255, 0.4) 100%);
+    box-shadow: inset 0 0 20px #fff, 0 0 10px rgba(255,255,255,0.2);
+    animation: floatUpWobble 8s linear infinite;
+    opacity: 0.6;
+}
+
+.flower {
+    position: absolute; 
+    top: -50px; 
+    font-size: 3rem; 
+    animation: floatDownRotate 8s linear infinite;
+    filter: drop-shadow(0 5px 5px rgba(0,0,0,0.1));
+}
+
+.confetti-piece {
+    position: absolute;
+    width: 10px; height: 15px;
+    opacity: 0.8;
+}
+
+/* --- 5. Cake Selection (Visual) --- */
+.cake-grid-visual {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 15px;
+}
+.cake-card {
+    background: white; border-radius: 10px; overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1); cursor: pointer;
+    transition: transform 0.2s; border: 2px solid transparent;
+}
+.cake-card img { width: 100%; height: 100px; object-fit: cover; display: block; }
+.cake-card span { display: block; padding: 5px; font-size: 0.8rem; font-weight: bold; }
+.cake-card.selected { border-color: var(--primary-color); transform: scale(1.05); }
+
+/* Cake Stage */
+.cake-container {
+    position: relative;
+    width: 280px;
+    margin: 40px auto;
+}
+.cake-image-wrapper {
+    width: 100%;
+    position: relative;
+    z-index: 5;
+}
+.cake-image-wrapper img {
+    width: 100%;
+    display: block;
+    filter: drop-shadow(0 10px 10px rgba(0,0,0,0.2));
+    border-radius: 10px;
+}
+
+/* Candles - Fixed on cake */
+.candles-overlay {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 50%; /* Top half of the cake image roughly */
+    z-index: 20;
+    pointer-events: none;
+}
+
+.candle {
+    position: absolute;
+    width: 6px; height: 25px;
+    background: repeating-linear-gradient(45deg, #fff, #fff 2px, #74b9ff 2px, #74b9ff 4px);
+    box-shadow: 0 2px 2px rgba(0,0,0,0.3);
+    /* Transforms originate from bottom center for realistic placement */
+    transform-origin: bottom center;
+}
+
+.flame {
+    width: 8px; height: 12px;
+    background: #ff9f43;
+    border-radius: 50% 50% 20% 20%;
+    position: absolute; top: -12px; left: -1px;
+    animation: flicker 0.1s infinite alternate;
+    box-shadow: 0 0 5px #ff9f43;
+    transition: opacity 0.5s;
+}
+.flame.out { opacity: 0; }
+
+/* Lyrics */
+#lyrics-display { 
+    margin-top: 20px; 
+    font-family: var(--font-heading); 
+    font-size: 1.5rem; 
+    color: var(--primary-color); 
+    min-height: 100px;
+}
+.lyric-line { opacity: 0; animation: fadeInLyric 1s forwards; margin: 5px 0; }
+.lyric-line:nth-child(1) { animation-delay: 0.5s; }
+.lyric-line:nth-child(2) { animation-delay: 3.0s; }
+.lyric-line:nth-child(3) { animation-delay: 5.5s; }
+.lyric-line:nth-child(4) { animation-delay: 8.0s; }
+.lyric-line:nth-child(5) { animation-delay: 10.5s; }
+.lyric-line:nth-child(6) { animation-delay: 13.0s; }
+.lyric-line:nth-child(7) { animation-delay: 15.5s; }
+
+
+/* --- 6. Fullscreen Overlays --- */
+.fullscreen-overlay {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(255, 255, 255, 0.95);
+    z-index: 100;
+    display: flex; justify-content: center; align-items: center;
+    text-align: center;
+    flex-direction: column;
+}
+
+#decorating-overlay h2 { font-family: var(--font-heading); font-size: 2.5rem; color: var(--secondary-color); animation: pulse 1s infinite; }
+
+#big-count-number {
+    font-size: 10rem; font-weight: bold; color: var(--primary-color);
+    animation: popIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Animations */
+@keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
+@keyframes floatUp { 0% { bottom: -120px; transform: translateX(0); } 100% { bottom: 110vh; transform: translateX(20px); } }
+@keyframes floatUpWobble { 
+    0% { bottom: -60px; transform: translateX(0); } 
+    25% { transform: translateX(25px); }
+    50% { transform: translateX(-25px); }
+    75% { transform: translateX(15px); }
+    100% { bottom: 110vh; transform: translateX(0); } 
+}
+@keyframes floatDownRotate {
+    0% { top: -60px; transform: rotate(0deg) translateX(0); }
+    100% { top: 110vh; transform: rotate(360deg) translateX(50px); }
+}
+@keyframes flicker { from { transform: scale(1); opacity: 0.9; } to { transform: scale(1.1); opacity: 1; } }
+@keyframes popIn { 0% { transform: scale(0); opacity: 0; } 80% { transform: scale(1.1); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
+@keyframes fadeInLyric { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Inputs */
+.input-time { padding: 8px; border: 1px solid #ddd; border-radius: 5px; }
+#wish-input { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 5px; }

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday!</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Google Fonts for aesthetics -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- Audio Elements (Hidden) -->
+    <audio id="audio-celebration" preload="auto" src="https://actions.google.com/sounds/v1/crowds/cheering_and_clapping.ogg"></audio>
+    <audio id="audio-cake" preload="auto" src="https://upload.wikimedia.org/wikipedia/commons/6/6e/Happy_Birthday_to_You_-_piano.ogg"></audio>
+
+    <!-- Overlay for "Decorating..." Animation -->
+    <div id="decorating-overlay" class="fullscreen-overlay hidden">
+        <h2>Decorating the room to match your vibe... ✨</h2>
+    </div>
+
+    <!-- Overlay for Big Countdown (5 4 3 2 1) -->
+    <div id="big-countdown-overlay" class="fullscreen-overlay hidden">
+        <div id="big-count-number">5</div>
+    </div>
+
+    <!-- Dynamic Background Layers -->
+    <div id="decorations-layer"></div>
+    
+    <!-- Wind Effect Layer (for blowing candles) -->
+    <div id="wind-layer"></div>
+
+    <main class="app-container">
+        
+        <!-- STAGE 1: The Closed Card -->
+        <div id="stage-initial" class="stage active">
+            <div class="card-scene">
+                <div class="card-wrapper" id="birthday-card">
+                    <div class="card-front">
+                        <div class="front-content">
+                            <h1>For You</h1>
+                            <p class="tap-hint">Tap to Open</p>
+                        </div>
+                    </div>
+                    <div class="card-inside">
+                        <div class="inside-content">
+                            <h2 id="card-greeting-name">Happy Birthday!</h2>
+                            <p>A little interactive experience to celebrate your special milestone.</p>
+                            <button class="btn-primary" id="btn-start-exp">Start Experience</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- STAGE 2: The Main Interactive Area -->
+        <div id="stage-experience" class="stage">
+            
+            <div class="content-scrollable">
+                
+                <!-- 1. Time Sync (First thing visible) -->
+                <section class="section-block" id="sec-timecheck">
+                    <p>To sync the magic, let's check the time.</p>
+                    <div class="button-group">
+                        <button class="btn-primary" id="btn-use-device-time">Sync with Device Time ⏱️</button>
+                    </div>
+                </section>
+
+                <!-- 2. The Main Timer (Initially Hidden) -->
+                <section class="section-block hidden" id="sec-countdown">
+                    <h3>The universe was blessed the day you arrived—your presence has been filling the world with joy ever since ✨</h3>
+                    <div id="age-timer" class="timer-display">
+                        Loading...
+                    </div>
+                    <button id="btn-goto-decor" class="btn-primary hidden" style="margin-top: 20px;">Customize the Vibe 🎨</button>
+                    <!-- Trigger for the big finale -->
+                    <button id="btn-trigger-finale" class="btn-primary hidden" style="margin-top: 20px; background: var(--text-dark);">Ready for the Big Moment? 🚀</button>
+                </section>
+
+                <!-- 3. Decorations (Shown after Timer) -->
+                <section class="section-block hidden" id="sec-decorate">
+                    <h3>Pick your decorations 🎨</h3>
+                    <p style="font-size: 0.9rem; color: #666; margin-bottom: 15px;">Select as many as you like!</p>
+                    <div class="decor-grid">
+                        <button class="decor-btn" data-type="balloons">🎈 Balloons</button>
+                        <button class="decor-btn" data-type="lights">✨ Fairy Lights</button>
+                        <button class="decor-btn" data-type="confetti">🎉 Confetti</button>
+                        <button class="decor-btn" data-type="bubbles">🫧 Bubbles</button>
+                        <button class="decor-btn" data-type="flowers">🌸 Flowers</button>
+                    </div>
+                    
+                    <button id="btn-apply-decor" class="btn-primary" style="margin-top: 20px; width: 100%;">✨ Decorate Room</button>
+                </section>
+
+                <!-- 4. Cake Selection (After Big Countdown) -->
+                <section class="section-block hidden" id="sec-cake-selection">
+                    <h3>Choose Your Flavor 🍰</h3>
+                    <div class="cake-grid-visual">
+                        <div class="cake-card" data-flavor="chocolate">
+                            <img src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=300&q=80" alt="Chocolate">
+                            <span>Chocolate</span>
+                        </div>
+                        <div class="cake-card" data-flavor="blackforest">
+                            <img src="https://images.unsplash.com/photo-1606890737304-57a1ca8a5b62?auto=format&fit=crop&w=300&q=80" alt="Black Forest">
+                            <span>Black Forest</span>
+                        </div>
+                        <div class="cake-card" data-flavor="redvelvet">
+                            <img src="https://images.unsplash.com/photo-1616541823729-00fe0aacd32c?auto=format&fit=crop&w=300&q=80" alt="Red Velvet">
+                            <span>Red Velvet</span>
+                        </div>
+                        <div class="cake-card" data-flavor="blueberry">
+                            <img src="https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?auto=format&fit=crop&w=300&q=80" alt="Blueberry">
+                            <span>Blueberry</span>
+                        </div>
+                        <div class="cake-card" data-flavor="lotus">
+                            <img src="https://images.unsplash.com/photo-1550950158-d0d960dff51b?auto=format&fit=crop&w=300&q=80" alt="Lotus Biscoff">
+                            <span>Lotus Biscoff</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 5. The Cake Stage -->
+                <div id="cake-stage" class="hidden section-block">
+                    <h3>It's time to blow out the candles! 🕯️</h3>
+                    <p style="font-size: 0.9rem; color: #666;">Blow into your mic to extinguish them.</p>
+
+                    <div class="cake-container">
+                        <div class="cake-image-wrapper">
+                            <!-- Candles are now injected INSIDE here to be relative to the image -->
+                            <div class="candles-overlay" id="candles-holder"></div>
+                            <img id="main-cake-img" src="" alt="Birthday Cake">
+                        </div>
+                    </div>
+
+                    <!-- Interaction Area -->
+                    <div id="interaction-area">
+                        <button id="btn-enable-mic" class="btn-primary">Enable Mic to Blow 🎙️</button>
+                        <p id="mic-status" class="hidden" style="margin-top: 10px; color: var(--primary-color);">Listening for wind... 🌬️</p>
+                        
+                        <!-- Wish Input -->
+                        <div id="wish-container" class="hidden">
+                            <p>One candle left... Make a special wish! ✨</p>
+                            <input type="text" id="wish-input" placeholder="Type your wish here...">
+                            <button id="btn-submit-wish" class="btn-primary">Make Wish</button>
+                        </div>
+                    </div>
+
+                    <!-- Lyrics Display (Hidden initially) -->
+                    <div id="lyrics-display" class="hidden">
+                        <p class="lyric-line">Happy Birthday to You 🎵</p>
+                        <p class="lyric-line">Happy Birthday to You 🎵</p>
+                        <p class="lyric-line">Happy Birthday Dear <span id="lyric-name">Friend</span> 🎵</p>
+                        <p class="lyric-line">Happy Birthday to You! 🎉</p>
+                        <p class="lyric-line">May the good lord bless you 🙏</p>
+                        <p class="lyric-line">May the good lord bless you 🙏</p>
+                        <p class="lyric-line">Happy Birthday to You! 🎂</p>
+                    </div>
+
+                    <button id="btn-cut-cake" class="btn-primary hidden">🔪 Cut the Cake</button>
+                    
+                    <div id="slice-offer" class="hidden">
+                        <p>Here is a slice just for you! 🍰</p>
+                    </div>
+                </div>
+
+                <!-- Section: Final Message -->
+                <section class="section-block hidden" id="sec-final">
+                    <div class="final-card">
+                        <h2>Happy 25th Birthday, <span id="friend-name-display"></span>!</h2>
+                        <div class="message-body">
+                            <p>Here is a little note from me:</p>
+                            <div class="handwritten-note">
+                                <p id="sender-msg-display"></p>
+                            </div>
+                        </div>
+                        <p class="signature">From your friend ❤️</p>
+                    </div>
+                </section>
+
+            </div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
